@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: conference-paper
+title: "Norm×Direction: Restoring the Missing Query Norm in Vision Linear Attention"
+authors:
+  - family-names: Meng
+    given-names: Weikang
+  - family-names: Luo
+    given-names: Yadan
+  - family-names: Huo
+    given-names: Liangyu
+  - family-names: Li
+    given-names: Yingjian
+  - family-names: Wang
+    given-names: Yaowei
+  - family-names: Li
+    given-names: Xin
+  - family-names: Zhang
+    given-names: Zheng
+conference:
+  name: "International Conference on Machine Learning"
+year: 2026
+url: "https://github.com/ZacharyMeng/NaLaFormer"

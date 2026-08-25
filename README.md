@@ -1,29 +1,57 @@
-# Norm×Direction: Restoring the Missing Query Norm in Vision Linear Attention [ICML 2026]
+<div align="center">
 
-🚀 Welcome to the repo of **NaLaFormer**!
+# NaLaFormer
 
-This repo contains the official **PyTorch** code for NaLaFormer.
+**Norm × Direction: Restoring the Missing Query Norm in Vision Linear Attention**
 
-[![arXiv](https://img.shields.io/badge/Arxiv-2506.21137-b31b1b.svg?logo=arXiv)](https://arxiv.org/abs/2506.21137)
+[![arXiv](https://img.shields.io/badge/arXiv-2506.21137-b31b1b.svg?logo=arxiv)](https://arxiv.org/abs/2506.21137)
+[![ICML 2026](https://img.shields.io/badge/ICML-2026-4b8bbe.svg)](https://arxiv.org/abs/2506.21137)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.4.0-ee4c2c.svg?logo=pytorch)](https://pytorch.org/)
+[![Python](https://img.shields.io/badge/Python-3.9%2B-3776ab.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/ZacharyMeng/NaLaFormer?style=social)](https://github.com/ZacharyMeng/NaLaFormer/stargazers)
 
-## Introduction
+[Weikang Meng](https://github.com/ZacharyMeng), Yadan Luo, Liangyu Huo, Yingjian Li, Yaowei Wang, Xin Li, Zheng Zhang
 
-### Motivation
+*International Conference on Machine Learning (ICML), 2026*
 
-Linear attention mitigates the quadratic complexity of softmax attention but suffers from a critical loss of expressiveness. We identify two primary causes: (1) The normalization operation cancels the query norm, which breaks the correlation between a query's norm and the spikiness (entropy) of the attention distribution as in softmax attention. (2) Standard techniques for enforcing non-negativity cause destructive information loss by nullifying valid inner-product interactions.
+<img src="assets/teaser.png" width="92%">
 
-To address these challenges, we propose **NaLaFormer**, which achieves a superior balance between expressive capability and efficiency.
+</div>
 
-### Method
+---
 
-We introduce NaLaFormer, a novel linear attention mechanism built upon a **norm×direction (ND)** decomposition of the query and key vectors. We leverage each component to solve a distinct problem:
+## 📰 News
 
-- **Query-norm-aware feature map**: The query norm is injected into our kernel to create a query-norm-aware map that restores the attention distribution's spikiness.
-- **Cosine direction similarity**: The direction vectors are processed by a geometric, cosine-based similarity metric that guarantees non-negativity while preserving the rich, fine-grained information of the inner product.
+- **[2026.07]** 🎉 NaLaFormer is accepted by **ICML 2026**!
+- **[2026.06]** 🚀 Code and ImageNet-1K training recipes are released.
+- **[2026.06]** 📄 Paper available on [arXiv](https://arxiv.org/abs/2506.21137).
 
-### Results
+## ✨ Highlights
 
-- Comparison of different models on ImageNet-1K.
+- **A fresh diagnosis of linear attention.** We pinpoint two root causes of its expressiveness gap: (1) normalization *cancels the query norm*, destroying the norm–spikiness correlation that softmax attention enjoys; (2) standard non-negativity tricks *nullify valid inner-product interactions*, causing destructive information loss.
+- **A principled fix — Norm × Direction (ND) decomposition.** A query-norm-aware feature map restores attention spikiness, while a cosine-based direction similarity guarantees non-negativity *without* discarding fine-grained inner-product information.
+- **Strong accuracy–efficiency trade-off.** NaLaFormer scales from **8M to 95M** parameters and consistently outperforms representative CNNs and Transformers on ImageNet-1K — e.g. **84.3%** Top-1 with only 26M params / 5.1G FLOPs.
+
+## 📖 Introduction
+
+Linear attention mitigates the quadratic complexity of softmax attention but suffers from a critical loss of expressiveness. We identify two primary causes:
+
+1. **The missing query norm.** The normalization operation cancels the query norm, which breaks the correlation between a query's norm and the spikiness (entropy) of the attention distribution as in softmax attention.
+2. **Destructive non-negativity.** Standard techniques for enforcing non-negativity cause information loss by nullifying valid inner-product interactions.
+
+To address these challenges, we propose **NaLaFormer**, a novel linear attention mechanism built upon a **Norm × Direction (ND)** decomposition of the query and key vectors, which achieves a superior balance between expressive capability and efficiency:
+
+- **Query-norm-aware feature map** — the query norm is injected into the kernel, restoring the attention distribution's spikiness.
+- **Cosine direction similarity** — direction vectors are compared with a geometric, cosine-based metric that guarantees non-negativity while preserving the rich, fine-grained information of the inner product.
+
+<div align="center">
+<img src="assets/architecture.png" width="95%">
+</div>
+
+## 📊 Results
+
+ImageNet-1K classification at 224² resolution, trained from scratch:
 
 | Model | Params | FLOPs | Top-1 Acc (%) |
 | :---: | :---: | :---: | :---: |
@@ -33,58 +61,64 @@ We introduce NaLaFormer, a novel linear attention mechanism built upon a **norm�
 | NaLaFormer-B | 52M | 12G | 85.2 |
 | NaLaFormer-L | 95M | 18G | 85.7 |
 
-## Dependencies
+<div align="center">
+<img src="assets/results.png" width="62%">
+</div>
 
-- Python 3.9+
-- PyTorch == 2.4.0
-- torchvision == 0.19.0
-- numpy
-- timm >= 0.4.12
-- fvcore
-- einops
+> Baseline numbers (DeiT, Swin, ConvNeXt, PVTv2) are taken from the respective original papers.
 
-## Data preparation
+## 🗃️ Model Zoo
 
-The ImageNet dataset should be prepared as follows:
+Pre-trained weights will be released soon. The following variants are supported:
+
+| Model | Resolution | Params | FLOPs | Top-1 (%) | Config name | Weights |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| NaLaFormer-XT | 224² | 8M | 1.0G | 79.1 | `NALAFORMER_XT` | coming soon |
+| NaLaFormer-T | 224² | 15M | 2.7G | 82.6 | `NALAFORMER_T` | coming soon |
+| NaLaFormer-S | 224² | 26M | 5.1G | 84.3 | `NALAFORMER_S` | coming soon |
+| NaLaFormer-B | 224² | 52M | 12G | 85.2 | `NALAFORMER_B` | coming soon |
+| NaLaFormer-L | 224² | 95M | 18G | 85.7 | `NALAFORMER_L` | coming soon |
+
+See [MODEL_ZOO.md](MODEL_ZOO.md) for detailed per-variant architecture configurations.
+
+## 🚀 Getting Started
+
+### Installation
+
+```bash
+git clone https://github.com/ZacharyMeng/NaLaFormer.git
+cd NaLaFormer
+
+conda create -n nalaformer python=3.9 -y
+conda activate nalaformer
+
+pip install torch==2.4.0 torchvision==0.19.0 --index-url https://download.pytorch.org/whl/cu121
+pip install -r requirements.txt
+```
+
+### Data Preparation
+
+The ImageNet-1K dataset should be organized as follows:
 
 ```
-$ tree data
 imagenet
 ├── train
 │   ├── class1
 │   │   ├── img1.jpeg
-│   │   ├── img2.jpeg
-│   │   └── ...
-│   ├── class2
-│   │   ├── img3.jpeg
 │   │   └── ...
 │   └── ...
 └── val
     ├── class1
     │   ├── img4.jpeg
-    │   ├── img5.jpeg
-    │   └── ...
-    ├── class2
-    │   ├── img6.jpeg
     │   └── ...
     └── ...
 ```
 
-## Pretrained Models
+### Evaluation
 
-Pre-trained weights will be released soon. The following models are supported in this repo:
+Evaluate a pre-trained model on the ImageNet validation set:
 
-| model | Reso | acc@1 | model name |
-| :---: | :---: | :---: | :---: |
-| NaLaFormer-XT | 224² | 79.1 | `NALAFORMER_XT` |
-| NaLaFormer-T | 224² | 82.6 | `NALAFORMER_T` |
-| NaLaFormer-S | 224² | 84.3 | `NALAFORMER_S` |
-| NaLaFormer-B | 224² | 85.2 | `NALAFORMER_B` |
-| NaLaFormer-L | 224² | 85.7 | `NALAFORMER_L` |
-
-Evaluate one model on ImageNet:
-
-```shell
+```bash
 python -m torch.distributed.launch --nproc_per_node=8 --use_env main.py \
     --model NALAFORMER_XT \
     --data-path <imagenet-path> \
@@ -92,28 +126,62 @@ python -m torch.distributed.launch --nproc_per_node=8 --use_env main.py \
     --eval --dist-eval
 ```
 
-## Train Models from Scratch
+### Training from Scratch
 
-**To train NaLaFormer on ImageNet from scratch, see `pretrain.sh` and run:**
+See `pretrain.sh` for the full recipe, or simply run:
 
-```shell
+```bash
 export DATA=/path/to/imagenet
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 export NPROC=8
 bash pretrain.sh
 ```
 
-You can also specify the model variant via `--model`, e.g. `NALAFORMER_T`, `NALAFORMER_S`, `NALAFORMER_B`, `NALAFORMER_L`.
+Specify other variants via `--model`, e.g. `NALAFORMER_T`, `NALAFORMER_S`, `NALAFORMER_B`, `NALAFORMER_L`.
 
-## Citation
+## 📁 Repository Structure
 
-If you find this repo helpful, please consider citing us.
+```
+NaLaFormer/
+├── NaLaformer/
+│   ├── NALA.py        # NaLaFormer backbone & Norm-Aware Linear Attention
+│   ├── main.py        # training / evaluation entry point
+│   ├── engine.py      # train & eval loops
+│   ├── datasets.py    # ImageNet data pipeline & augmentations
+│   ├── losses.py      # soft-target / label-smoothing criterion
+│   ├── samplers.py    # RASampler for distributed training
+│   ├── utils.py       # EMA, checkpointing, metrics, misc.
+│   └── pretrain.sh    # ImageNet-1K pre-training recipe
+├── assets/            # figures used in this README
+├── MODEL_ZOO.md       # detailed variant configurations
+├── requirements.txt
+└── README.md
+```
 
-```latex
+## ✅ TODO
+
+- [x] Release ImageNet-1K training & evaluation code
+- [ ] Release pre-trained weights
+- [ ] Downstream tasks: object detection & semantic segmentation
+- [ ] Throughput / latency benchmark scripts
+
+## 📝 Citation
+
+If you find this repo helpful, please consider citing us:
+
+```bibtex
 @inproceedings{meng2026nalaformer,
-  title={Norm$\times$Direction: Restoring the Missing Query Norm in Vision Linear Attention},
-  author={Weikang Meng and Yadan Luo and Liangyu Huo and Yingjian Li and Yaowei Wang and Xin Li and Zheng Zhang},
-  booktitle={International Conference on Machine Learning},
-  year={2026}
+  title     = {Norm$\times$Direction: Restoring the Missing Query Norm in Vision Linear Attention},
+  author    = {Weikang Meng and Yadan Luo and Liangyu Huo and Yingjian Li and Yaowei Wang and Xin Li and Zheng Zhang},
+  booktitle = {International Conference on Machine Learning},
+  year      = {2026}
 }
 ```
+
+## 🙏 Acknowledgements
+
+This codebase builds upon the excellent open-source projects [timm](https://github.com/huggingface/pytorch-image-models), [DeiT](https://github.com/facebookresearch/deit) and [Swin Transformer](https://github.com/microsoft/Swin-Transformer). We thank the authors for their great work.
+
+## 📄 License
+
+This project is released under the [MIT License](LICENSE).

@@ -1,3 +1,22 @@
+"""NaLaFormer: Norm-Aware Linear Attention Transformer for vision.
+
+Official PyTorch implementation of
+"Norm x Direction: Restoring the Missing Query Norm in Vision Linear
+Attention" (ICML 2026).
+
+NaLaFormer is a hierarchical vision backbone whose core is the
+Norm-Aware Linear Attention (NaLa) module. It decomposes queries and
+keys into a *norm* and a *direction* component:
+
+  * a query-norm-aware feature map restores the spikiness of the
+    attention distribution that vanilla linear attention loses through
+    normalization;
+  * a cosine-based direction similarity guarantees non-negativity
+    without nullifying valid inner-product interactions.
+
+Model variants (registered in timm):
+    NALAFORMER_XT / NALAFORMER_T / NALAFORMER_S / NALAFORMER_B / NALAFORMER_L
+"""
 import math
 import torch
 import torch.nn.functional as F
@@ -40,6 +59,19 @@ class LayerNorm2d(nn.Module):
 
 
 class NormAwareLinearAttn(nn.Module):
+    """Norm-Aware Linear Attention (NaLa).
+
+    Given queries q and keys k, applies the Norm x Direction (ND)
+    decomposition:
+
+      1. split q into its L2 norm ||q|| and direction q / ||q||;
+      2. inject ||q|| into the feature map via a tanh-gated power,
+         restoring the query-norm -> attention-spikiness correlation;
+      3. use a ReLU-split + cosine-style direction similarity that is
+         non-negative yet preserves signed inner-product information.
+
+    Linear complexity O(N) in the number of tokens N.
+    """
 
     def __init__(self, dim, num_heads):
         super().__init__()
@@ -334,6 +366,25 @@ class RoPE(nn.Module):
 
 
 class NALAFORMER(nn.Module):
+    """NaLaFormer hierarchical vision backbone.
+
+    Four stages of NaLa / vanilla-attention blocks with patch merging
+    in between, followed by a projection + BN + linear classifier.
+
+    Args:
+        in_chans (int): number of input image channels.
+        num_classes (int): number of classification classes.
+        flagss (list[list[str]]): per-stage block types,
+            'l' = NaLa linear attention, 'v' = vanilla softmax attention.
+        embed_dims (list[int]): per-stage embedding dimensions.
+        depths (list[int]): per-stage block counts.
+        num_heads (list[int]): per-stage attention head counts.
+        mlp_ratios (list[float]): per-stage FFN expansion ratios.
+        drop_path_rate (float): maximum stochastic depth rate.
+        projection (int): projection dimension before the classifier.
+        layerscales (list[bool]): per-stage LayerScale switches.
+        layer_init_values (list[float]): per-stage LayerScale init values.
+    """
 
     def __init__(self, in_chans=3, num_classes=1000, flagss=[['l'] * 10, ['l'] * 10, ['v', 'v'] * 10, ['v'] * 10],
                  embed_dims=[96, 192, 384, 768], depths=[2, 2, 6, 2], num_heads=[3, 6, 12, 24],

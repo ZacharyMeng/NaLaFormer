@@ -1,0 +1,6 @@
+torch==2.4.0
+torchvision==0.19.0
+numpy
+timm>=0.4.12
+fvcore
+einops
