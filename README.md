@@ -74,20 +74,6 @@ ImageNet-1K classification at 224² resolution, trained from scratch:
 <p><em>Efficiency analysis: Accuracy vs. FLOPs curves on ImageNet-1K.</em></p>
 </div>
 
-## 🗃️ Model Zoo
-
-Pre-trained weights will be released soon. The following variants are supported:
-
-| Model | Resolution | Params | FLOPs | Top-1 (%) | Config name | Weights |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| NaLaFormer-XT | 224² | 8M | 1.0G | 79.1 | `NALAFORMER_XT` | coming soon |
-| NaLaFormer-T | 224² | 15M | 2.7G | 82.6 | `NALAFORMER_T` | coming soon |
-| NaLaFormer-S | 224² | 26M | 5.1G | 84.3 | `NALAFORMER_S` | coming soon |
-| NaLaFormer-B | 224² | 52M | 12G | 85.2 | `NALAFORMER_B` | coming soon |
-| NaLaFormer-L | 224² | 95M | 18G | 85.7 | `NALAFORMER_L` | coming soon |
-
-See [MODEL_ZOO.md](MODEL_ZOO.md) for detailed per-variant architecture configurations.
-
 ## 🚀 Getting Started
 
 ### Installation
