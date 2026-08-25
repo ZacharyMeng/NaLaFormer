@@ -27,26 +27,29 @@
 - **[2026.06]** 🚀 Code and ImageNet-1K training recipes are released.
 - **[2026.06]** 📄 Paper available on [arXiv](https://arxiv.org/abs/2506.21137).
 
+## ✨ Highlights
+
+- **A fresh diagnosis of linear attention.** We pinpoint two root causes of its expressiveness gap: (1) normalization *cancels the query norm*, destroying the norm–spikiness correlation that softmax attention enjoys; (2) standard non-negativity tricks *nullify valid inner-product interactions*, causing destructive information loss.
+- **A principled fix — Norm × Direction (ND) decomposition.** A query-norm-aware feature map restores attention spikiness, while a cosine-based direction similarity guarantees non-negativity *without* discarding fine-grained inner-product information.
+- **Strong accuracy–efficiency trade-off.** NaLaFormer scales from **8M to 95M** parameters and consistently outperforms representative CNNs and Transformers on ImageNet-1K — e.g. **84.3%** Top-1 with only 26M params / 5.1G FLOPs.
+
 ## 📖 Introduction
 
-Linear attention mitigates the quadratic complexity of softmax attention but suffers from a critical loss of expressiveness. Applying a **norm–direction decomposition** $\mathbf{q}_t = \|\mathbf{q}_t\|\, d(\mathbf{q}_t)$, $\mathbf{k}_i = \|\mathbf{k}_i\|\, d(\mathbf{k}_i)$ to linear attention,
+Linear attention mitigates the quadratic complexity of softmax attention but suffers from a critical loss of expressiveness. We identify two primary causes:
 
-$$\mathrm{LinearAttn}_t = \frac{\phi(\mathbf{q}_t)\sum_{i=1}^{N}\phi(\mathbf{k}_i)^\top\mathbf{v}_i}{\phi(\mathbf{q}_t)\sum_{j=1}^{N}\phi(\mathbf{k}_j)^\top} = \frac{\|\phi(\mathbf{q}_t)\|\; d(\phi(\mathbf{q}_t))\sum_{i=1}^{N}\|\phi(\mathbf{k}_i)\|\, d(\phi(\mathbf{k}_i))^\top\mathbf{v}_i}{\|\phi(\mathbf{q}_t)\|\; d(\phi(\mathbf{q}_t))\sum_{j=1}^{N}\|\phi(\mathbf{k}_j)\|\, d(\phi(\mathbf{k}_j))^\top},$$
-
-exposes a critical **norm cancellation**: the query norm $\|\phi(\mathbf{q}_t)\|$ appears in both the numerator and the denominator, so it is *canceled out* by the division. As a result, only *key* norms influence linear attention outputs — the model becomes **norm-unaware** w.r.t. queries, and the correlation between a query's norm and the spikiness (entropy) of its attention distribution, which softmax attention naturally enjoys, is destroyed. Meanwhile, standard element-wise tricks for enforcing non-negativity (e.g. $\mathrm{ReLU}$, $1+\mathrm{ELU}$) further nullify valid signed inner-product interactions.
+1. **The missing query norm.** The normalization operation cancels the query norm, which breaks the correlation between a query's norm and the spikiness (entropy) of the attention distribution as in softmax attention.
+2. **Destructive non-negativity.** Standard techniques for enforcing non-negativity cause information loss by nullifying valid inner-product interactions.
 
 <div align="center">
 <img src="assets/fig1_motivation.png" width="85%">
-<p><em>Correlation between entropy and vector norm: query norms correlate strongly with entropy
-in softmax attention (top), while key norms exhibit only weak correlation (bottom).</em></p>
+<p><em>Visualization of the correlation between entropy and vector norm: query norms correlate strongly
+with entropy in softmax attention (top), while key norms exhibit only weak correlation (bottom).</em></p>
 </div>
 
-## 🛠️ Method
+To address these challenges, we propose **NaLaFormer**, a novel linear attention mechanism built upon a **Norm × Direction (ND)** decomposition of the query and key vectors, which achieves a superior balance between expressive capability and efficiency:
 
-We propose **NaLaFormer**, a linear attention built upon a **Norm × Direction (ND)** decomposition of queries and keys, where each component fixes one problem:
-
-- **Query-norm-aware feature map** — the query norm $\|\mathbf{q}\|$ is re-injected into the kernel through a $\tanh$-bounded power function, restoring attention spikiness while keeping the map norm-aware and numerically stable.
-- **Cosine inhibit** — direction vectors are compared via a cosine-based similarity $[\cos(\cdot), \sin(\cdot)]$, which guarantees non-negativity and preserves the norm, without discarding fine-grained inner-product information.
+- **Query-norm-aware feature map** — the query norm is injected into the kernel, restoring the attention distribution's spikiness.
+- **Cosine direction similarity** — direction vectors are compared with a geometric, cosine-based metric that guarantees non-negativity while preserving the rich, fine-grained information of the inner product.
 
 <div align="center">
 <img src="assets/fig2_framework.png" width="95%">
@@ -106,7 +109,7 @@ imagenet
 
 ### Evaluation
 
-Evaluate a pre-trained model on the ImageNet validation set (pre-trained weights will be released soon):
+Evaluate a pre-trained model on the ImageNet validation set:
 
 ```bash
 python -m torch.distributed.launch --nproc_per_node=8 --use_env main.py \
@@ -143,6 +146,7 @@ NaLaFormer/
 │   ├── utils.py       # EMA, checkpointing, metrics, misc.
 │   └── pretrain.sh    # ImageNet-1K pre-training recipe
 ├── assets/            # logo & paper figures used in this README
+├── MODEL_ZOO.md       # detailed variant configurations
 ├── requirements.txt
 └── README.md
 ```
