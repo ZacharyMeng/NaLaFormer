@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/logo.png" width="110">
+
 # NaLaFormer
 
 **Norm × Direction: Restoring the Missing Query Norm in Vision Linear Attention**
@@ -14,8 +16,6 @@
 [Weikang Meng](https://github.com/ZacharyMeng), Yadan Luo, Liangyu Huo, Yingjian Li, Yaowei Wang, Xin Li, Zheng Zhang
 
 *International Conference on Machine Learning (ICML), 2026*
-
-<img src="assets/teaser.png" width="92%">
 
 </div>
 
@@ -40,13 +40,21 @@ Linear attention mitigates the quadratic complexity of softmax attention but suf
 1. **The missing query norm.** The normalization operation cancels the query norm, which breaks the correlation between a query's norm and the spikiness (entropy) of the attention distribution as in softmax attention.
 2. **Destructive non-negativity.** Standard techniques for enforcing non-negativity cause information loss by nullifying valid inner-product interactions.
 
+<div align="center">
+<img src="assets/fig1_motivation.png" width="85%">
+<p><em>Visualization of the correlation between entropy and vector norm: query norms correlate strongly
+with entropy in softmax attention (top), while key norms exhibit only weak correlation (bottom).</em></p>
+</div>
+
 To address these challenges, we propose **NaLaFormer**, a novel linear attention mechanism built upon a **Norm × Direction (ND)** decomposition of the query and key vectors, which achieves a superior balance between expressive capability and efficiency:
 
 - **Query-norm-aware feature map** — the query norm is injected into the kernel, restoring the attention distribution's spikiness.
 - **Cosine direction similarity** — direction vectors are compared with a geometric, cosine-based metric that guarantees non-negativity while preserving the rich, fine-grained information of the inner product.
 
 <div align="center">
-<img src="assets/architecture.png" width="95%">
+<img src="assets/fig2_framework.png" width="95%">
+<p><em>The overall framework of NaLaFormer: (a) gated linear attention with the ND-decomposed kernel,
+(b) query-norm-aware spikiness, and (c) cosine inhibit for non-negativity.</em></p>
 </div>
 
 ## 📊 Results
@@ -62,10 +70,9 @@ ImageNet-1K classification at 224² resolution, trained from scratch:
 | NaLaFormer-L | 95M | 18G | 85.7 |
 
 <div align="center">
-<img src="assets/results.png" width="62%">
+<img src="assets/fig6_efficiency.png" width="52%">
+<p><em>Efficiency analysis: Accuracy vs. FLOPs curves on ImageNet-1K.</em></p>
 </div>
-
-> Baseline numbers (DeiT, Swin, ConvNeXt, PVTv2) are taken from the respective original papers.
 
 ## 🗃️ Model Zoo
 
@@ -152,7 +159,7 @@ NaLaFormer/
 │   ├── samplers.py    # RASampler for distributed training
 │   ├── utils.py       # EMA, checkpointing, metrics, misc.
 │   └── pretrain.sh    # ImageNet-1K pre-training recipe
-├── assets/            # figures used in this README
+├── assets/            # logo & paper figures used in this README
 ├── MODEL_ZOO.md       # detailed variant configurations
 ├── requirements.txt
 └── README.md
